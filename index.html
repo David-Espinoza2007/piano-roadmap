@@ -7,15 +7,12 @@
 <meta name="theme-color" content="#0E0E10">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
 /* Layout: one music-stand column; bottom bar is the key slip, tabs are keys. */
 :root{
   --bg:#F6F5F0; --surface:#FFFFFF; --ink:#16151A; --muted:#6B6862; --line:#DEDBD2;
   --brass:#8E6A1F; --on-brass:#FFFFFF; --ok:#2F7A4F; --warn:#B5452F; --slip:#16151A; --slip-ink:#EDEAE2;
-  --display:"Bodoni Moda",Didot,"Bodoni 72",Georgia,serif;
-  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --body:system-ui,-apple-system,Roboto,"Segoe UI",Arial,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
@@ -29,8 +26,9 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);-webkit-tap-highlight-color:transparent;
   padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(84px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 main{max-width:640px;margin:0 auto}
-h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
-h1{font-size:2rem} h2{font-size:1.45rem} h3{font-size:1.1rem}
+h1,h2,h3,h4{line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:1.75rem;font-weight:800;letter-spacing:-.01em} h2{font-size:1.25rem;font-weight:700} h3{font-size:1.05rem;font-weight:700}
+h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--brass);margin-top:4px}
 a{color:var(--brass)}
 button,select,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -51,11 +49,15 @@ ul.plain{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;g
 label.check{display:flex;gap:10px;align-items:flex-start;padding:4px 0}
 label.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--brass);flex:none}
 label.check input:checked + span{color:var(--muted);text-decoration:line-through}
+.card p{margin:0}
+.card ul:not(.plain),.card ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:6px}
+details.card[open]>summary{padding-bottom:4px;border-bottom:1px solid var(--line)}
 .bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
 .bar>i{display:block;height:100%;background:var(--brass)}
 details>summary{cursor:pointer;list-style:none}
 details>summary::-webkit-details-marker{display:none}
-details>summary::after{content:"＋";float:right;color:var(--muted)}
+details>summary{position:relative;padding-right:28px}
+details>summary::after{content:"＋";position:absolute;top:0;right:0;color:var(--muted)}
 details[open]>summary::after{content:"－"}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700;border:1px solid currentColor}
 .st0{color:var(--muted)} .st1{color:var(--brass)} .st2{color:var(--ok)}
@@ -67,7 +69,7 @@ nav.slip button{flex:1;min-width:0;border:0;border-radius:0 0 6px 6px;background
 nav.slip button svg{width:22px;height:22px}
 nav.slip button[aria-current="page"]{background:#FFFFFF;box-shadow:inset 0 -3px 0 #D2A84C}
 /* Metronome */
-.bpm{font-family:var(--display);font-size:5.5rem;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.bpm{font-size:5.5rem;font-weight:800;letter-spacing:-.03em;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
 .dots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:transparent;padding:0}
 .dot[data-a="2"]{border-color:var(--brass)}
@@ -75,7 +77,7 @@ nav.slip button[aria-current="page"]{background:#FFFFFF;box-shadow:inset 0 -3px 
 .dot.on{background:var(--ink)} .dot.on[data-a="2"]{background:var(--brass)}
 input[type=range]{width:100%;accent-color:var(--brass)}
 .play{width:88px;height:88px;border-radius:50%;border:0;background:var(--brass);color:var(--on-brass);font-weight:700;font-size:1rem;align-self:center}
-.timer{font-family:var(--display);font-size:3.2rem;line-height:1;font-variant-numeric:tabular-nums}
+.timer{font-size:3rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
 .grid7{display:grid;grid-template-columns:5.5rem repeat(7,1fr);gap:4px;align-items:center;font-size:.8rem}
 .grid7 i{display:block;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line);margin:auto}
 .grid7 i.y{background:var(--brass);border-color:var(--brass)}
@@ -523,27 +525,158 @@ vp.addEventListener('submit',e=>{e.preventDefault();const t=document.getElementB
 /* ===================== GUÍA ===================== */
 const INTS=['2ª m','2ª M','3ª m','3ª M','4ª J','Tritono','5ª J','6ª m','6ª M','7ª m','7ª M','8ª'];
 const EAR={q:null,ok:0,n:0};
-const G=(t,b)=>`<details class="card"><summary><h3>${t}</h3></summary>${b}</details>`;
+// Secciones de la guía: name="guia" hace que solo una esté abierta a la vez (acordeón nativo).
+const li=a=>'<ul>'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>';
+const ol=a=>'<ol>'+a.map(x=>`<li>${x}</li>`).join('')+'</ol>';
+const tbl=(h,rows)=>`<div class="tablewrap"><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</table></div>`;
+const G=(t,sub,o)=>`<details class="card" name="guia"><summary><h3>${t}</h3><div class="small muted">${sub}</div></summary>
+  ${o.que?`<h4>Qué es</h4><p>${o.que}</p>`:''}${o.para?`<h4>Para qué sirve</h4><p>${o.para}</p>`:''}
+  ${o.como?`<h4>Cómo se hace</h4>${o.como}`:''}${o.extra||''}${o.ojo?`<h4>Errores comunes</h4>${li(o.ojo)}`:''}${o.fase?`<p class="small muted">${o.fase}</p>`:''}</details>`;
+const GUIDE=[
+ ['Cómo practicar',[
+  G('El método base','Las reglas que aplican a todo',{
+   que:'El sistema con el que se practica cualquier cosa: escalas, estudios y piezas. Es lo que separa practicar de solo tocar.',
+   para:'Que cada minuto entrene lo correcto. Tocar rápido con errores solo entrena los errores; tocar lento y bien construye memoria muscular limpia.',
+   como:ol(['Metrónomo siempre en técnica y piezas nuevas. Empieza a la mitad del tempo objetivo, o donde salga perfecto aunque sea ridículamente lento.','El tempo sube solo cuando tocas 3 veces seguidas sin fallo: +5 bpm. Si fallas, baja 10 y reconstruye.','Divide en secciones de 2-4 compases. Trabaja el fragmento que falla y luego únelo con lo anterior.','Manos por separado primero, juntas después.','Si duele, paras. La tensión no es esfuerzo bueno: es técnica mal hecha.']),
+   ojo:['Tocar la pieza de principio a fin una y otra vez con los mismos errores.','Subir el tempo antes de tener 3 pasadas limpias.','Repetir la parte que ya suena bien porque se siente productivo.']}),
+  G('Cómo montar una pieza','De la partitura a tocarla con música',{
+   que:'El procedimiento para aprender una pieza nueva desde cero hasta tocarla completa, a tempo y con expresión.',
+   para:'Aprender la pieza una sola vez y bien, sin vicios de digitación ni lagunas de memoria que después cuestan meses quitar.',
+   como:ol(['<strong>Escúchala</strong> 2-3 veces siguiendo la partitura. Decide tempo y carácter.','<strong>Divídela</strong> en secciones de 4-8 compases (A, B, C…). Trabaja una a la vez.','<strong>Manos separadas</strong>, lento, con la digitación escrita a lápiz desde el primer día. No la cambies después.','<strong>Manos juntas</strong> a mitad de tempo o menos, con metrónomo. +5 bpm tras 3 pasadas limpias.','<strong>Siguiente sección</strong> solo cuando la anterior salga 3 veces seguidas sin error.','<strong>Une secciones</strong> trabajando las uniones: últimos 2 compases de A + primeros 2 de B.','<strong>Última semana:</strong> tócala completa, grábate y pule dinámicas, pedal y fraseo.']),
+   extra:'<h4>Después</h4><p>Toda pieza terminada se repasa 1 vez por semana durante un mes para no perderla.</p>',
+   ojo:['Dejar la musicalidad para nunca: va al final, pero va.','Improvisar la digitación cada vez que tocas.','Ignorar las uniones entre secciones: ahí se rompe todo.']}),
+  G('Higiene del pianista','Postura y cómo evitar lesiones',{
+   que:'Los hábitos físicos que te dejan tocar muchos años sin dolor.',
+   para:'La tendinitis y el dolor de muñeca son la lesión típica de quien practica con tensión. Se previenen; curarlas toma meses.',
+   como:li(['<strong>Banco:</strong> a la altura en que el antebrazo queda horizontal con las teclas.','<strong>Cuerpo:</strong> hombros abajo, muñecas sueltas, dedos curvos como sujetando una pelota.','<strong>Calentamiento:</strong> 2 min de escalas lentas antes de cualquier cosa fuerte.','<strong>Límite:</strong> máximo 20 min de técnica pura seguidos; alterna con repertorio.']),
+   ojo:['Seguir tocando con dolor.','Subir los hombros en pasajes difíciles.','Muñeca rígida o hundida.'],
+   fase:'Si hay dolor persistente en muñeca o antebrazo: para y revisa postura con los videos de Graham Fitch o Josh Wright.'})]],
+ ['Técnica',[
+  G('Escalas','Fase 0 en adelante · diario, 8-10 min',{
+   que:'Tocar las notas de una tonalidad en orden, subiendo y bajando, normalmente 2 octavas. Una escala mayor sigue el patrón tono-tono-semitono-tono-tono-tono-semitono (en C: C D E F G A B C).',
+   para:'Casi toda la música está hecha de fragmentos de escalas. Entrenan la digitación, el paso del pulgar (la jugada clave de la técnica) y te hacen conocer cada tonalidad con los dedos.',
+   como:ol(['Una mano a la vez, 1 octava, sin metrónomo: memoriza la digitación.','Manos juntas, 2 octavas, ♩=60-80 en negras. 2-3 repeticiones perfectas.','Pasa a corcheas cuando las negras salgan limpias.','Rota 2-3 tonalidades por día por el círculo de quintas (la pantalla Hoy te dice cuáles).','1 min con dinámica: crescendo al subir, diminuendo al bajar.']),
+   extra:'<h4>El paso del pulgar</h4><p>El pulgar se mueve hacia su siguiente nota mientras suenan las anteriores, por debajo de la mano, sin torcer la muñeca ni mover el codo. Es un movimiento suave, no un salto.</p><h4>Digitaciones (1 = pulgar, 5 = meñique)</h4>'+tbl(['Escala','Mano derecha','Mano izquierda'],[['C G D A E','123 1234 · 123 12345','54321 321 4321 321'],['F','1234 123 · 1234 123','54321 321 4321 321'],['B♭','4 123 1234 123…','321 4321 321…'],['E♭','3 1234 123 123…','321 4321 321…'],['Am Em Dm (armónicas)','Como su relativa mayor','Como su relativa mayor']])+'<p class="small muted">La lógica: el pulgar nunca toca tecla negra, y los dedos 3 y 4 se turnan según el grupo de negras.</p><h4>Variantes del roadmap</h4>'+tbl(['Variante','Qué es'],[['Menor armónica (F0-1)','Menor natural con la 7ª subida medio tono. Am: A B C D E F G♯.'],['En 3ras / 6tas (F2)','Manos juntas, una empieza en la tónica y otra una 3ª o 6ª arriba. Suena a dueto.'],['En octavas, MD (F2)','Cada nota doblada con dedos 1 y 5. Golpe de muñeca, no de brazo. 1-2 min.'],['Cromática (F2)','Todas las teclas, semitono a semitono. MD: 1 3 1 3 1 2 3 1 3 1 3 1.'],['Pentatónica menor (F2)','5 notas: 1 ♭3 4 5 ♭7. Am: A C D E G. La escala madre del blues y el rock.'],['Blues (F2)','Pentatónica + la ♭5 o "blue note". Am: A C D E♭ E G.'],['Modos (F2-3)','La escala mayor empezando en otro grado. Dórico desde el 2º (sobre m7), mixolidio desde el 5º (sobre 7), lidio desde el 4º (sobre maj7).'],['Bebop (F4)','Mixolidio + 7ª natural: G A B C D E F F♯. Con la nota extra, las notas del acorde caen en tiempo fuerte al tocar corcheas.']]),
+   ojo:['Acento sin querer en el pulgar: el error nº 1. Escúchate.','Girar la muñeca o mover el codo en el paso del pulgar.','Hacer todas las escalas todos los días: mejor rotar.']}),
+  G('Arpegios','Fase 0 en adelante · junto con las escalas',{
+   que:'Las notas de un acorde tocadas una a una, en orden, a lo largo de 2 o más octavas. Arpegio de C mayor: C E G C E G C.',
+   para:'Son la base de los acompañamientos, de muchos pasajes clásicos y del vocabulario del jazz: improvisar muchas veces es enlazar arpegios.',
+   como:ol(['Digitación MD para tríadas: 1 2 3 · 1 2 4 · 1 2 4 (cierra con 5). MI: 5 4 2 · 1 4 2 · 1 4 2 1.','El paso del pulgar es más largo que en las escalas: el antebrazo acompaña con un movimiento lateral suave.','Mismo sistema que escalas: mano a mano, luego juntas, ♩=60-80, rotando tonalidades.']),
+   extra:'<h4>Desde la Fase 2</h4><p><strong>Dominante 7:</strong> G B D F. <strong>Disminuido 7:</strong> F♯ A C E♭. En el disminuido todas las notas están a una 3ª menor: es simétrico y fácil de memorizar.</p>',
+   ojo:['Saltar con el codo en lugar de deslizar el antebrazo.','Huecos de sonido en el cambio de posición.']}),
+  G('Hanon','Fase 0 en adelante · 5-10 min',{
+   que:'"El pianista virtuoso" (1873): 60 ejercicios de un patrón corto que se repite subiendo por grados. El #1 es C E F G A G F E con dedos 1 2 3 4 5 4 3 2.',
+   para:'Igualar la fuerza e independencia de los 5 dedos (el 4 y el 5 son débiles por naturaleza). Es el gimnasio: no es música, son pesas.',
+   como:ol(['Lento: ♩=60 en negras.','1ª pasada "dedos altos": levanta cada dedo antes de tocar, golpe desde el dedo, la mano quieta.','2ª pasada legato: dedos cerca de las teclas, sonido conectado y parejo, brazo relajado.','Escúchate: todas las notas deben sonar igual.','Máximo 5-10 min al día.']),
+   extra:'<h4>Cuáles en cada fase</h4><p>#1-5 (F0) · #6-10 (F1) · #11-20 y #46 tríllos (F2-3) · #32 octavas (F3-4).</p><h4>Tríllos (#46)</h4><p>Alternar dos notas vecinas rápido (C-D-C-D…). Empieza a ♩=60 con 2 notas por pulso y con una rotación suave del antebrazo, como abrir una llave.</p>',
+   ojo:['Tocarlo rápido y tenso: es peor que no hacerlo.','Seguir cuando el antebrazo se cansa: es tensión, no progreso.']}),
+  G('Estudios: Czerny y Burgmüller','Fase 1 en adelante · 3-4 por semana',{
+   que:'Piezas cortas compuestas para entrenar un problema técnico concreto dentro de música de verdad. A diferencia de Hanon, que es patrón puro, aquí la técnica va en contexto.',
+   para:'Pasar la técnica del gimnasio a la música: escalas, arpegios, pasos de pulgar y notas dobles tal como aparecen en las piezas.',
+   como:ol(['Léelo a primera vista una vez.','Identifica el patrón técnico que repite.','Trabájalo por secciones con metrónomo, como una pieza.','Vale cuando sale 3 veces seguidas sin error a tempo. Después, al siguiente.']),
+   extra:tbl(['Material','Fase','Qué entrena'],[['Czerny Op. 599','1-2','Lo básico: escalas, arpegios, pulgar, notas dobles'],['Czerny Op. 849','3-4','Velocidad y resistencia'],['Burgmüller Op. 100','4','Técnica con musicalidad: aquí importa más el sonido que el tempo']]),
+   ojo:['Memorizarlos: no hace falta.','Quedarse meses en el mismo estudio.']}),
+  G('Pedal','Fase 0 en adelante',{
+   que:'El pedal derecho (de resonancia) levanta los apagadores y deja sonar las cuerdas aunque sueltes las teclas. El izquierdo (una corda) suaviza el sonido. El central varía según el piano.',
+   para:'Usado bien, el piano "canta" y une acordes que los dedos no pueden conectar. Usado mal, todo se vuelve una sopa.',
+   como:ol(['Toca una tríada de C y pisa el pedal.','Cambia a G: primero toca el nuevo acorde y JUSTO DESPUÉS levanta y repisa. El pie va un instante detrás de la mano.','Escucha que el acorde viejo no se cuele sobre el nuevo.','Repite la cadena C-F-G-C lento hasta que el oído mande sobre el pie.']),
+   extra:'<h4>Desde la Fase 2</h4><p>Medio pedal y pedal por armonía en Chopin y Debussy. Practica tus piezas también sin pedal: el pedal disimula legatos falsos y los dedos deben conectar de verdad.</p>',
+   ojo:['Pisar y levantar al mismo tiempo que tocas: corta el sonido o lo ensucia.','Dejar el pie abajo todo el compás.']})]],
+ ['Jazz',[
+  G('Shell voicings (1-3-7)','Fase 2',{
+   que:'Acordes de jazz reducidos a su esqueleto: fundamental (1), 3ª y 7ª. La 3ª y la 7ª definen si el acorde es mayor, menor o dominante; la 5ª sobra.',
+   para:'Tocar cualquier cifrado de jazz rápido y con buen sonido. Es el primer paso para leer lead sheets y acompañar.',
+   como:ol(['Elige una tonalidad y toca su ii-V-I. En C: Dm7 → G7 → Cmaj7.','MI: la fundamental. MD: 3ª + 7ª (usa la tabla de arriba para cada tonalidad).','Fíjate que las notas guía se mueven por paso mínimo: la 7ª de un acorde baja a la 3ª del siguiente.','3 tonalidades por día siguiendo el círculo de cuartas: en 4 días recorres las 12.']),
+   ojo:['Pensar nota por nota en vez de memorizar la forma de la mano.','Saltar de posición en vez de mover las voces por paso.'],
+   fase:'Meta: menos de 3 segundos por acorde, sin pensar.'}),
+  G('Rootless voicings tipo A y B','Fase 3',{
+   que:'Acordes de 7ª tocados sin la fundamental, porque la toca el bajista. Solo tocas el color. <strong>Tipo A:</strong> 3-5-7-9 (Cmaj7: E G B D). <strong>Tipo B:</strong> 7-9-3-5 (Cmaj7: B D E G).',
+   para:'Es el sonido del piano de jazz moderno (Bill Evans, Wynton Kelly). Dejan espacio al bajo y suenan mucho más ricos que los acordes completos.',
+   como:ol(['ii-V-I en las 12 tonalidades, alternando tipos: A en el ii, B en el V, A en el I (o al revés).','Primero con la MI sola, luego repartido entre manos.','Meta: tocar un standard entero mirando solo los símbolos de acordes.']),
+   ojo:['Tocarlos demasiado graves: debajo de C3 suenan turbios.','Cambiar de tipo al azar: alternar A y B es lo que mantiene las voces cerca.']}),
+  G('Swing y comping','Fase 3',{
+   que:'<strong>Swing:</strong> la forma de tocar corcheas desiguales, la primera más larga que la segunda (como un tresillo de 2+1), con el peso en los tiempos 2 y 4. <strong>Comping:</strong> acompañar a un improvisador con acordes rítmicos, no en cada tiempo. <strong>Charleston:</strong> el primer patrón: golpe en el 1 y en el "y" del 2.',
+   para:'Sin swing no suena a jazz aunque las notas sean correctas. El comping es lo que más vas a tocar en una jam.',
+   como:ol(['Pon el metrónomo en "Solo en 2 y 4" y la subdivisión en swing.','Toca el Charleston con un voicing de ii-V-I, 4 compases por acorde.','Variantes: solo en el "y" del 1, en el 2 y el "y" del 3, etc.','Escucha a Red Garland y Wynton Kelly comping detrás de Miles Davis.']),
+   ojo:['Apurarse: el swing va relajado, ligeramente detrás del beat.','Tocar corcheas iguales ("cuadradas").']}),
+  G('Walking bass','Fase 3-4',{
+   que:'La línea del contrabajo tocada con la mano izquierda: una nota por tiempo (negras), caminando entre las fundamentales de los acordes.',
+   para:'Tocar solo como trío completo: bajo en la MI y acordes o melodía en la MD.',
+   como:ol(['Tiempo 1: la fundamental.','Tiempos 2 y 3: otras notas del acorde (3ª, 5ª).','Tiempo 4: una nota de aproximación, un semitono arriba o abajo de la siguiente fundamental.','Ejemplo ii-V-I en C: D F A B | G B D F♯ | C.','Practica 12 compases de blues en F, MI sola, ♩=60. Cuando camine, añade shells en la MD en los tiempos 1 y 3.']),
+   ojo:['Perder la fundamental en el tiempo 1.','Tocar la línea tan fuerte como la MD.']}),
+  G('Improvisación','Fase 3 en adelante',{
+   que:'Inventar melodías en el momento sobre la armonía de una pieza. No es tocar notas al azar de una escala: es hablar con un vocabulario.',
+   para:'Es la meta del roadmap. Todo el trabajo de arpegios, oído y voicings converge aquí.',
+   como:ol(['<strong>Paso 1:</strong> solo notas del acorde (arpegios) sobre cada cambio.','<strong>Paso 2:</strong> añade notas de paso entre ellas.','<strong>Paso 3:</strong> añade aproximaciones cromáticas hacia las notas del acorde.','<strong>Paso 4:</strong> motivos: una idea corta que repites, varías y desarrollas.','Siempre con iReal Pro de banda. Empieza con blues en F y Bb, Autumn Leaves y Blue Bossa.']),
+   ojo:['Tocar escalas de arriba abajo: suena a ejercicio, no a música.','No dejar silencios: frasea como si respiraras.','Saltarse la transcripción: el vocabulario se aprende de los grandes.']}),
+  G('Escalas de bebop','Fase 4',{
+   que:'Escalas de 8 notas: la mixolidia con una 7ª natural extra (G A B C D E F F♯). Hay también versión mayor (C D E F G G♯ A B).',
+   para:'Con la nota extra, al tocar corcheas las notas del acorde caen en tiempo fuerte. Es el secreto del sonido de Charlie Parker y Bud Powell.',
+   como:ol(['Tócala en corcheas con metrónomo y escucha cómo encaja.','Bájala empezando desde cada nota del acorde: fundamental, 3ª, 5ª y 7ª.']),
+   ojo:['Usarla subiendo: funciona sobre todo bajando.']})]],
+ ['Teoría',[
+  G('Círculo de quintas','Fase 0',{
+   que:'Las 12 tonalidades ordenadas por quintas: C G D A E B F♯ (cada una suma un sostenido) y C F B♭ E♭ A♭ D♭ G♭ (cada una suma un bemol). Cada mayor tiene una relativa menor con la misma armadura, 3 semitonos abajo: C ↔ Am, G ↔ Em.',
+   para:'Saber al instante cuántas alteraciones tiene una tonalidad, cuáles tonalidades son vecinas, y seguir el orden de rotación de escalas. En jazz se recorre al revés (en cuartas: C F B♭ E♭…), que es como se mueven los ii-V-I.',
+   como:ol(['Memoriza el orden de los sostenidos: F C G D A E B. Los bemoles son el mismo orden al revés: B E A D G C F.','Dibújalo de memoria una vez al día hasta que salga solo.','Úsalo para rotar tus escalas.']),
+   ojo:['Memorizarlo sin tocarlo: aplícalo el mismo día al teclado.']}),
+  G('Intervalos','Fase 0',{
+   que:'La distancia entre dos notas, medida en semitonos (la tecla más cercana, blanca o negra).',
+   para:'Son los ladrillos de todo: los acordes son intervalos apilados y las melodías son intervalos en fila. Reconocerlos de oído es el primer paso para sacar música de oído.',
+   como:'<p>Constrúyelos contando semitonos y luego aprende a oírlos con una canción de referencia:</p>'+tbl(['Semitonos','Intervalo','Canción de referencia'],[['1','2ª menor','Tiburón (Jaws)'],['2','2ª mayor','Cumpleaños feliz (2ª a 3ª nota)'],['3','3ª menor','Smoke on the Water'],['4','3ª mayor','When the Saints Go Marching In'],['5','4ª justa','Marcha nupcial (Wagner)'],['6','Tritono','Los Simpson'],['7','5ª justa','Estrellita, ¿dónde estás?'],['8','6ª menor','The Entertainer (el salto tras las 3 primeras notas)'],['9','6ª mayor','My Bonnie'],['10','7ª menor','Star Trek (serie original)'],['11','7ª mayor','Take On Me (coro)'],['12','Octava','Somewhere Over the Rainbow']]),
+   ojo:['Contar teclas blancas en vez de semitonos.']}),
+  G('Tríadas e inversiones','Fase 0-1',{
+   que:'Una tríada es un acorde de 3 notas apiladas en terceras: fundamental, 3ª y 5ª. Una inversión es la misma tríada con otra nota en el bajo.',
+   para:'Son los acordes de casi toda la música clásica y pop. Las inversiones permiten pasar de un acorde a otro moviendo poco la mano.',
+   como:tbl(['Tipo','Construcción','En C'],[['Mayor','3ª mayor + 3ª menor (4+3)','C E G'],['Menor','3ª menor + 3ª mayor (3+4)','C E♭ G'],['Disminuida','3ª menor + 3ª menor (3+3)','C E♭ G♭'],['Aumentada','3ª mayor + 3ª mayor (4+4)','C E G♯']])+tbl(['Posición','Nota en el bajo','Cifrado','En C'],[['Fundamental','La fundamental','—','C E G'],['1ª inversión','La 3ª','6','E G C'],['2ª inversión','La 5ª','6/4','G C E']]),
+   ojo:['Nombrarlas lento: la meta de la Fase 0 es cualquier tríada en menos de 2 segundos.']}),
+  G('Acordes de séptima','Fase 1',{
+   que:'Una tríada más una cuarta nota: la 7ª. Hay 5 tipos básicos.',
+   para:'Son el idioma del jazz y le dan color a cualquier canción pop. En la Fase 3 los usarás para rearmonizar boleros.',
+   como:tbl(['Símbolo','Construcción','En C'],[['maj7','Tríada mayor + 7ª mayor','C E G B'],['7 (dominante)','Tríada mayor + 7ª menor','C E G B♭'],['m7','Tríada menor + 7ª menor','C E♭ G B♭'],['m7♭5 (semidisminuido)','Tríada disminuida + 7ª menor','C E♭ G♭ B♭'],['dim7','Tríada disminuida + 7ª disminuida','C E♭ G♭ A']]),
+   ojo:['Confundir maj7 (7ª mayor) con 7 (7ª menor): el símbolo "7" solo siempre es dominante.']}),
+  G('Grados, cadencias y progresiones','Fase 1-2',{
+   que:'Cada acorde de una tonalidad tiene un número romano según la nota de la escala donde empieza: mayúscula si es mayor, minúscula si es menor. En C: I = C, ii = Dm, iii = Em, IV = F, V = G, vi = Am, vii° = B°. Una cadencia es la forma en que termina una frase.',
+   para:'Entender por qué una canción suena como suena, reconocer progresiones de oído y transportar a cualquier tonalidad.',
+   como:tbl(['Nombre','Grados','Suena a'],[['Cadencia perfecta','V → I','Final, punto y aparte'],['Cadencia plagal','IV → I','"Amén"'],['Cadencia rota','V → vi','Sorpresa, final evitado'],['Semicadencia','… → V','Coma, pregunta'],['Pop','I-V-vi-IV','Let It Be y medio pop'],['Años 50','I-vi-IV-V','Stand By Me'],['Jazz','ii-V-I','Todo el jazz']]),
+   extra:'<h4>Funciones</h4><p><strong>Tónica (I):</strong> reposo. <strong>Subdominante (IV, ii):</strong> se aleja. <strong>Dominante (V):</strong> tensión que pide volver al I.</p>',
+   ojo:['Analizar sin tocar: toca cada progresión en 4 tonalidades.']}),
+  G('Lead sheets y cifrado americano','Fase 1-2',{
+   que:'Un lead sheet es una partitura con solo la melodía y los símbolos de acordes encima (Cmaj7, Dm7♭5, G7♭9). Es el formato del Real Book y del jazz.',
+   para:'Te vuelve independiente de los tutoriales: con melodía y acordes puedes tocar cualquier canción a tu manera.',
+   como:ol(['MD: la melodía. MI: el acorde en posición cerrada.','Cuando domines séptimas: cada acorde mayor pásalo a maj7 o 6, y cada menor a m7. Suena más "pro" al instante.','Desde la Fase 3: voicings rootless y comping. Cualquier pop se vuelve jazz.']),
+   extra:'<h4>Cómo leer un símbolo</h4><p>Letra = fundamental. "m" = menor. "maj7" = 7ª mayor. "7" solo = dominante. Números extra (9, 11, 13) = extensiones. ♭ o ♯ junto a un número = esa nota alterada. "/" = nota en el bajo (C/E = C con E en el bajo).</p>'}),
+  G('Modos','Fase 2-3',{
+   que:'Escalas que usan las mismas notas de una escala mayor pero empiezan en otro grado. D dórico = notas de C mayor empezando en D (D E F G A B C).',
+   para:'Cada modo tiene un color y encaja con un tipo de acorde. Son las escalas base para improvisar en jazz.',
+   como:tbl(['Modo','Empieza en','Se usa sobre','Ejemplo'],[['Dórico','2º grado','m7','D E F G A B C'],['Mixolidio','5º grado','7','G A B C D E F'],['Lidio','4º grado','maj7','F G A B C D E']])+'<p>Toca el modo con la MD y debajo el acorde correspondiente con la MI para oír su color.</p>'})]],
+ ['Oído y lectura',[
+  G('Oído y transcripción','Diario, 5 min · transcripción 1 vez por semana',{
+   que:'El entrenamiento para reconocer lo que escuchas (intervalos, acordes, progresiones) y poder tocarlo sin partitura. Transcribir es sacar de oído una melodía o un solo grabado.',
+   para:'Improvisar jazz es cantar con los dedos. Esta habilidad viene del oído, no de los libros.',
+   como:ol(['5 min diarios con el entrenador de esta pantalla o Perfect Ear.','Elige algo sencillo para transcribir.','Escucha la frase varias veces sin tocar.','Cántala. Si no la puedes cantar, no la oíste de verdad.','Búscala nota a nota en el teclado, sin partitura.','Verifícala tocando junto al audio.','Desde la Fase 2, escríbela en MuseScore.']),
+   extra:'<h4>Qué transcribir en cada fase</h4><p>F1: una melodía que sepas de memoria. F2: 2-4 compases de una canción. F3: 8 compases de un solo de Chet Baker o Miles Davis.</p><p class="small muted">Para bajar la velocidad sin cambiar el tono: Music Speed Changer o Amazing Slow Downer (Android), o la velocidad de YouTube.</p>',
+   ojo:['Ir al teclado antes de cantar.','Elegir solos demasiado rápidos al inicio.']}),
+  G('Lectura a primera vista','1 página por semana',{
+   que:'Tocar una partitura que nunca has visto, sin parar. Es una habilidad distinta del repertorio: en repertorio memorizas a fondo; aquí sobrevives a lo desconocido.',
+   para:'Leer más rápido te deja aprender piezas más rápido y tocar con otros.',
+   como:ol(['Usa material 2 niveles abajo de tu repertorio (Alfred o Faber nivel 2 en F0).','30 seg de análisis antes de tocar: armadura, compás, la nota más rápida, patrones repetidos.','Toca continuo, sin volver atrás aunque falles. El ritmo nunca se detiene.','Lee un compás adelante de donde tocas.']),
+   ojo:['Detenerte a corregir cada error.','Usar piezas que estás montando como repertorio.']})]],
+ ['Recursos',[
+  G('Canales, libros y sitios','Qué usar para qué',{
+   extra:'<h4>YouTube: clásico y técnica</h4><p>Josh Wright (técnica sana), Pianote (lecciones generales), Hoffman Academy (reactivar lectura en F0), Graham Fitch (cómo practicar), David Bruce Composer (teoría y análisis).</p><h4>YouTube: jazz</h4><p>Jazz Tutorial / Julian Bradley (paso a paso), Aimee Nolte (oído y primeros standards), Open Studio, PianoPig (voicings), Charles Cornell, Rick Beato, 12tone, Adam Neely, Nahre Sol.</p><h4>Libros, en orden</h4>'+ol(['Alfred o Faber Adult Piano (F0-1)','Hanon: The Virtuoso Pianist','Czerny Op. 599 y 849','Cuaderno de Anna Magdalena','The Jazz Piano Book, Mark Levine (F2+)','Patterns for Jazz, Jerry Coker (F3+)','Effortless Mastery, Kenny Werner (F3+)','The Real Book, Hal Leonard (F2+)'])+'<h4>Sitios</h4><p><a href="https://imslp.org" target="_blank" rel="noopener">IMSLP</a> (partituras clásicas gratis), <a href="https://www.musictheory.net" target="_blank" rel="noopener">musictheory.net</a>, <a href="https://www.learnjazzstandards.com" target="_blank" rel="noopener">LearnJazzStandards</a>, <a href="https://www.pianogroove.com" target="_blank" rel="noopener">PianoGroove</a>.</p><h4>Discos esenciales</h4><p>Kind of Blue (Miles Davis), Sunday at the Village Vanguard (Bill Evans), Night Train (Oscar Peterson), Saxophone Colossus (Sonny Rollins), The Sidewinder (Lee Morgan), Getz/Gilberto.</p>'})]]
+];
 function renderGuia(){
   const keyOpts=FOURTHS.map(k=>`<option value="${k}">${fmt(k)}</option>`).join('');
-  document.getElementById('v-guia').innerHTML=`<header><div class="eyebrow">Cómo se hace cada ejercicio</div><h1>Guía</h1></header>
-  <div class="card"><h2>Entrenador de intervalos</h2><p class="small muted" style="margin:0">Escucha dos notas y elige el intervalo. ${S.phase===0?'Fase 0: solo ascendentes.':'Ascendentes y descendentes.'}</p>
+  document.getElementById('v-guia').innerHTML=`<header><div class="eyebrow">Qué es cada cosa y cómo se hace</div><h1>Guía</h1></header>
+  <div class="card"><h2>Entrenador de intervalos</h2><p class="small muted" style="margin:0">Suenan dos notas y eliges la distancia entre ellas. Entrena tu oído para reconocer melodías. ${S.phase===0?'Fase 0: solo ascendentes.':'Ascendentes y descendentes.'}</p>
     <div class="row"><button class="btn primary" id="ear-play">${EAR.q?'Repetir':'Nuevo intervalo'}</button><button class="btn" id="ear-new">Otro</button><span class="num small" id="ear-score">${EAR.ok}/${EAR.n}</span></div>
     <div class="answer">${INTS.map((n,i)=>`<button class="btn sm" data-int="${i+1}">${n}</button>`).join('')}</div><div id="ear-msg" class="small" aria-live="polite"></div></div>
-  <div class="card"><h2>ii-V-I con shell voicings</h2><p class="small muted" style="margin:0">Fundamental en la MI; 3ª y 7ª en la MD. Fíjate cómo las notas guía se mueven por paso mínimo.</p>
+  <div class="card"><h2>ii-V-I con shell voicings</h2><p class="small muted" style="margin:0">La progresión más común del jazz, con cada acorde reducido a fundamental, 3ª y 7ª. Elige una tonalidad: fundamental en la MI, 3ª y 7ª en la MD.</p>
     <select class="btn" id="v-key" aria-label="Tonalidad">${keyOpts}</select><div class="tablewrap" id="v-out"></div></div>
-  <div class="card"><h2>Blues en F</h2><div class="tablewrap"><table class="num"><tr>${['F7','B♭7','F7','F7'].map(c=>`<td>${c}</td>`).join('')}</tr><tr>${['B♭7','B♭7','F7','D7'].map(c=>`<td>${c}</td>`).join('')}</tr><tr>${['Gm7','C7','F7','C7'].map(c=>`<td>${c}</td>`).join('')}</tr></table></div>
-    <p class="small muted" style="margin:0">5 min diarios: arpegios de cada acorde → escala blues (F A♭ B♭ C♭ C E♭) → licks. Escucha "Night Train" de Oscar Peterson.</p></div>
-  ${G('El método base','<ul><li>Metrónomo siempre en técnica y piezas nuevas. Empieza a la mitad del tempo objetivo.</li><li>El tempo sube solo tras 3 pasadas seguidas sin fallo: +5 bpm. Si fallas, baja 10.</li><li>Trabaja el fragmento que falla (2-4 compases), luego únelo con lo anterior.</li><li>Manos separadas primero, juntas después.</li><li>Si duele, paras. La tensión es técnica mal hecha.</li></ul>')}
-  ${G('Escalas y digitaciones','<p>Dedos curvos, muñeca suelta. Prepara el paso del pulgar con anticipación, sin torcer la muñeca. Todas las notas igual de fuertes. Rota 2-3 tonalidades por día por el círculo de quintas.</p><div class="tablewrap"><table><tr><th>Escala</th><th>MD</th><th>MI</th></tr><tr><td>C G D A E</td><td>123 1234 · 123 12345</td><td>54321 321 4321 321</td></tr><tr><td>F</td><td>1234 123 1234 123</td><td>54321 321 4321 321</td></tr><tr><td>B♭</td><td>4 123 1234 123…</td><td>321 4321 321…</td></tr><tr><td>E♭</td><td>3 1234 123 123…</td><td>321 4321 321…</td></tr><tr><td>Am Em Dm (arm.)</td><td colspan="2">Igual que su relativa mayor</td></tr></table></div><p class="small muted">La lógica: el pulgar nunca toca tecla negra. Menor armónica = 7ª subida (Am: A B C D E F G♯). Pentatónica menor: 1 ♭3 4 5 ♭7. Blues: + ♭5. Dórico = mayor desde el 2º grado (sobre m7), mixolidio desde el 5º (sobre 7), lidio desde el 4º (sobre maj7).</p>')}
-  ${G('Arpegios','<p>MD tríadas: 123 124 124 · MI: 542 142 1421. El antebrazo acompaña el desplazamiento. Desde F2: dominante 7 (G B D F) y disminuido 7 (F♯ A C E♭), que es simétrico. Improvisar muchas veces es enlazar arpegios.</p>')}
-  ${G('Hanon','<ol><li>Lento: ♩=60.</li><li>1ª pasada "dedos altos": levanta cada dedo, golpe desde el dedo.</li><li>2ª pasada legato, dedos pegados, sonido parejo.</li><li>Escucha: si el pulgar golpea o el 4 suena flojo, ese es tu trabajo.</li><li>Máximo 5-10 min. Tríllos (#46): rotación suave del antebrazo.</li></ol>')}
-  ${G('Estudios (Czerny, Burgmüller)','<p>Trátalos como mini-piezas: identifica el patrón técnico que repiten y trabájalos por secciones con metrónomo. Valen cuando salen 3 veces seguidas sin error a tempo. No hace falta memorizarlos.</p>')}
-  ${G('Jazz: voicings, comping, walking bass','<p><strong>Shell (1-3-7):</strong> 3 tonalidades por día en cuartas; en 4 días recorres las 12.</p><p><strong>Rootless A:</strong> 3-5-7-9 (Cmaj7: E G B D). <strong>B:</strong> 7-9-3-5 (B D E G). Alterna A y B en el ii-V-I.</p><p><strong>Charleston:</strong> golpe en el 1 y en el "y" del 2, metrónomo en 2 y 4. Toca detrás del beat.</p><p><strong>Walking bass:</strong> fundamental en el 1, notas del acorde en 2-3, aproximación cromática en el 4. ii-V-I en C: D F A B | G B D F♯ | C.</p><p><strong>Bebop:</strong> mixolidio + 7ª natural (G A B C D E F F♯), en corcheas, bajando desde cada nota del acorde.</p>')}
-  ${G('Pedal','<p>Toca el nuevo acorde y JUSTO DESPUÉS levanta y repisa. Practica C-F-G-C lento hasta que el oído mande sobre el pie. Desde F2, toca tus piezas también sin pedal.</p>')}
-  ${G('Oído y transcripción','<ol><li>Elige algo sencillo.</li><li>Escucha la frase varias veces sin tocar.</li><li>Cántala. Si no la cantas, no la oíste.</li><li>Búscala nota a nota en el teclado.</li><li>Verifícala junto al audio.</li><li>Desde F2, escríbela en MuseScore.</li></ol><p class="small muted">Para bajar la velocidad sin cambiar el tono: Music Speed Changer o Amazing Slow Downer (Android), o la velocidad de YouTube.</p>')}
-  ${G('Lectura a primera vista','<p>Material 2 niveles abajo de tu repertorio. 30 seg de análisis (armadura, compás, nota más rápida, patrones). Toca continuo, sin volver atrás: el ritmo nunca se detiene. Lee un compás adelante.</p>')}
-  ${G('Higiene del pianista','<ul><li>Calienta 2 min antes de cualquier cosa fuerte.</li><li>Hombros abajo, muñecas sueltas, antebrazo horizontal.</li><li>Máximo 20 min de técnica pura seguidos.</li><li>Dolor persistente: para y revisa postura (Graham Fitch, Josh Wright).</li></ul>')}
+  <div class="card"><h2>Blues en F</h2><p class="small muted" style="margin:0">La forma de 12 compases que es la base de todo el jazz. Cada casilla es un compás.</p><div class="tablewrap"><table class="num"><tr>${['F7','B♭7','F7','F7'].map(c=>`<td>${c}</td>`).join('')}</tr><tr>${['B♭7','B♭7','F7','D7'].map(c=>`<td>${c}</td>`).join('')}</tr><tr>${['Gm7','C7','F7','C7'].map(c=>`<td>${c}</td>`).join('')}</tr></table></div>
+    <p class="small muted" style="margin:0">5 min diarios: arpegios de cada acorde → escala blues de F (F A♭ B♭ C♭ C E♭) → licks. Escucha "Night Train" de Oscar Peterson.</p></div>
+  ${GUIDE.map(([g,secs])=>`<h2 style="margin-top:8px">${g}</h2>${secs.join('')}`).join('')}
   <div class="card"><h2>Apps para tu Android</h2><div class="tablewrap"><table>
     <tr><th>Para qué</th><th>App</th><th>Nota</th></tr>
     <tr><td>Banda de jazz</td><td><strong>iReal Pro</strong></td><td>Sí existe en Android. Indispensable desde F2.</td></tr>
@@ -556,7 +689,6 @@ function renderGuia(){
     <tr><td>Piezas pop (opcional)</td><td>Flowkey / Simply Piano</td><td>Ambas en Android, con suscripción.</td></tr>
     <tr><td>Video mensual</td><td>Cámara del S22+</td><td>Graba en horizontal y con el micrófono hacia el piano.</td></tr>
   </table></div></div>
-  ${G('Canales, libros y sitios','<p><strong>Clásico/técnica:</strong> Josh Wright, Pianote, Hoffman Academy, Graham Fitch, David Bruce Composer.</p><p><strong>Jazz:</strong> Jazz Tutorial (Julian Bradley), Aimee Nolte, Open Studio, PianoPig, Charles Cornell, Rick Beato, 12tone, Adam Neely, Nahre Sol.</p><p><strong>Libros, en orden:</strong> Alfred o Faber Adult → Hanon → Czerny 599 y 849 → Anna Magdalena → The Jazz Piano Book (Levine) → Patterns for Jazz (Coker) → Effortless Mastery (Werner) → The Real Book.</p><p><strong>Sitios:</strong> <a href="https://imslp.org" target="_blank" rel="noopener">IMSLP</a>, <a href="https://www.learnjazzstandards.com" target="_blank" rel="noopener">LearnJazzStandards</a>, <a href="https://www.pianogroove.com" target="_blank" rel="noopener">PianoGroove</a>.</p><p><strong>Discos:</strong> Kind of Blue, Sunday at the Village Vanguard, Night Train, Saxophone Colossus, The Sidewinder, Getz/Gilberto.</p>')}
   <div class="card"><h2>Respaldo y ajustes</h2>
     <p class="small muted" style="margin:0">Tu progreso vive solo en este teléfono. Descarga un respaldo de vez en cuando.</p>
     <div class="row"><button class="btn" id="exp">Descargar respaldo</button><label class="btn">Restaurar respaldo<input type="file" id="imp" accept="application/json,.json" hidden></label></div>
@@ -568,6 +700,8 @@ function showVoicing(k){document.getElementById('v-out').innerHTML=`<table><tr><
 function earNew(){const r=48+Math.floor(Math.random()*19),i=1+Math.floor(Math.random()*12),down=S.phase>0&&Math.random()<.5;EAR.q={r,i,down};earPlay()}
 function earPlay(){audio();if(!EAR.q)return earNew();const {r,i,down}=EAR.q,t=AC.currentTime+.05;tone(down?r+i:r,t);tone(down?r:r+i,t+.9);document.getElementById('ear-msg').textContent=down?'Descendente':'Ascendente'}
 const vg=document.getElementById('v-guia');
+// Respaldo para navegadores sin <details name>: cerrar las demás al abrir una.
+vg.addEventListener('toggle',e=>{const d=e.target;if(d.open&&d.name==='guia'){vg.querySelectorAll('details[name=guia][open]').forEach(x=>x!==d&&(x.open=false));d.scrollIntoView({block:'nearest'})}},true);
 vg.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
   if(t.id==='ear-play'){earPlay();t.textContent='Repetir'}
   else if(t.id==='ear-new')earNew();
