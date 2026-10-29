@@ -57,8 +57,17 @@ details.card[open]>summary{padding-bottom:4px;border-bottom:1px solid var(--line
 details>summary{cursor:pointer;list-style:none}
 details>summary::-webkit-details-marker{display:none}
 details>summary{position:relative;padding-right:28px}
-details>summary::after{content:"＋";position:absolute;top:0;right:0;color:var(--muted)}
-details[open]>summary::after{content:"－"}
+details>summary::after{content:"+";position:absolute;top:-4px;right:0;font-size:1.6rem;line-height:1;color:var(--muted);transition:transform .22s ease}
+details[open]>summary::after{transform:rotate(45deg)}
+/* Apertura animada donde el navegador lo soporta (Chrome 131+); si no, abre al instante. */
+@supports selector(::details-content){
+  :root{interpolate-size:allow-keywords}
+  details.card{gap:0}
+  details.card::details-content{display:flex;flex-direction:column;gap:12px;block-size:0;padding-top:0;overflow:hidden;opacity:0;
+    transition:block-size .22s ease,padding-top .22s ease,opacity .22s ease,content-visibility .22s allow-discrete}
+  details.card[open]::details-content{block-size:auto;padding-top:12px;opacity:1}
+}
+.btn:disabled{opacity:.5;cursor:default}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700;border:1px solid currentColor}
 .st0{color:var(--muted)} .st1{color:var(--brass)} .st2{color:var(--ok)}
 .tablewrap{overflow-x:auto} table{border-collapse:collapse;width:100%;font-size:.875rem} th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
@@ -84,7 +93,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .kbd{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-weight:700}
 .answer{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .ok{color:var(--ok)} .bad{color:var(--warn)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::after,details::details-content{transition:none!important}}
 </style>
 </head>
 <body>
@@ -524,7 +533,21 @@ vp.addEventListener('submit',e=>{e.preventDefault();const t=document.getElementB
 
 /* ===================== GUÍA ===================== */
 const INTS=['2ª m','2ª M','3ª m','3ª M','4ª J','Tritono','5ª J','6ª m','6ª M','7ª m','7ª M','8ª'];
-const EAR={q:null,ok:0,n:0};
+const EAR={q:null,ok:0,n:0,busy:0};
+const EAR_LEN=3; // segundos que ocupa un intervalo (2 notas + caída): nada nuevo suena antes
+// Piano real: Salamander Grand Piano (Alexander Holm, CC-BY 3.0), una muestra cada 3ª menor;
+// las notas intermedias se afinan con playbackRate (máx. ±1.5 semitonos, no se nota).
+const SAMPLES=['C3','Ds3','Fs3','A3','C4','Ds4','Fs4','A4','C5','Ds5','Fs5','A5','C6'];
+const smidi=n=>({C:0,Ds:3,Fs:6,A:9})[n.slice(0,-1)]+12*(+n.slice(-1)+1);
+let PIANO=null;
+function loadPiano(){return PIANO??=Promise.all(SAMPLES.map(n=>fetch('piano/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>audio().decodeAudioData(b)).then(buf=>[smidi(n),buf]))).catch(e=>{PIANO=null;throw e})}
+function piano(bufs,midi,t,hold){
+  const [m,buf]=bufs.reduce((a,b)=>Math.abs(b[0]-midi)<Math.abs(a[0]-midi)?b:a);
+  const src=AC.createBufferSource(),g=AC.createGain();
+  src.buffer=buf;src.playbackRate.value=2**((midi-m)/12);
+  g.gain.setValueAtTime(1,t);g.gain.setTargetAtTime(0,t+hold,.12);
+  src.connect(g).connect(MASTER);src.start(t);src.stop(t+hold+.8);
+}
 // Secciones de la guía: name="guia" hace que solo una esté abierta a la vez (acordeón nativo).
 const li=a=>'<ul>'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>';
 const ol=a=>'<ol>'+a.map(x=>`<li>${x}</li>`).join('')+'</ol>';
@@ -671,7 +694,7 @@ function renderGuia(){
   document.getElementById('v-guia').innerHTML=`<header><div class="eyebrow">Qué es cada cosa y cómo se hace</div><h1>Guía</h1></header>
   <div class="card"><h2>Entrenador de intervalos</h2><p class="small muted" style="margin:0">Suenan dos notas y eliges la distancia entre ellas. Entrena tu oído para reconocer melodías. ${S.phase===0?'Fase 0: solo ascendentes.':'Ascendentes y descendentes.'}</p>
     <div class="row"><button class="btn primary" id="ear-play">${EAR.q?'Repetir':'Nuevo intervalo'}</button><button class="btn" id="ear-new">Otro</button><span class="num small" id="ear-score">${EAR.ok}/${EAR.n}</span></div>
-    <div class="answer">${INTS.map((n,i)=>`<button class="btn sm" data-int="${i+1}">${n}</button>`).join('')}</div><div id="ear-msg" class="small" aria-live="polite"></div></div>
+    <div class="answer">${INTS.map((n,i)=>`<button class="btn sm" data-int="${i+1}">${n}</button>`).join('')}</div><div id="ear-msg" class="small" aria-live="polite"></div><p class="small muted">Sonido: Salamander Grand Piano, de Alexander Holm (CC-BY 3.0).</p></div>
   <div class="card"><h2>ii-V-I con shell voicings</h2><p class="small muted" style="margin:0">La progresión más común del jazz, con cada acorde reducido a fundamental, 3ª y 7ª. Elige una tonalidad: fundamental en la MI, 3ª y 7ª en la MD.</p>
     <select class="btn" id="v-key" aria-label="Tonalidad">${keyOpts}</select><div class="tablewrap" id="v-out"></div></div>
   <div class="card"><h2>Blues en F</h2><p class="small muted" style="margin:0">La forma de 12 compases que es la base de todo el jazz. Cada casilla es un compás.</p><div class="tablewrap"><table class="num"><tr>${['F7','B♭7','F7','F7'].map(c=>`<td>${c}</td>`).join('')}</tr><tr>${['B♭7','B♭7','F7','D7'].map(c=>`<td>${c}</td>`).join('')}</tr><tr>${['Gm7','C7','F7','C7'].map(c=>`<td>${c}</td>`).join('')}</tr></table></div>
@@ -697,8 +720,22 @@ function renderGuia(){
   showVoicing('C');
 }
 function showVoicing(k){document.getElementById('v-out').innerHTML=`<table><tr><th>Acorde</th><th>MI</th><th>MD (3ª + 7ª)</th></tr>${twoFiveOne(k).map(r=>`<tr><td><strong>${r[0]}</strong></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table>`}
-function earNew(){const r=48+Math.floor(Math.random()*19),i=1+Math.floor(Math.random()*12),down=S.phase>0&&Math.random()<.5;EAR.q={r,i,down};earPlay()}
-function earPlay(){audio();if(!EAR.q)return earNew();const {r,i,down}=EAR.q,t=AC.currentTime+.05;tone(down?r+i:r,t);tone(down?r:r+i,t+.9);document.getElementById('ear-msg').textContent=down?'Descendente':'Ascendente'}
+const earBusy=()=>AC&&AC.currentTime<EAR.busy;
+function earNew(){if(earBusy())return;const r=48+Math.floor(Math.random()*19),i=1+Math.floor(Math.random()*12),down=S.phase>0&&Math.random()<.5;EAR.q={r,i,down};earPlay()}
+async function earPlay(){
+  audio();if(earBusy())return;
+  if(!EAR.q)return earNew();
+  EAR.busy=AC.currentTime+EAR_LEN+5; // reserva mientras carga el piano
+  const msg=document.getElementById('ear-msg'),btns=['ear-play','ear-new'].map(id=>document.getElementById(id));
+  btns.forEach(b=>b&&(b.disabled=true));
+  let bufs=null;if(!PIANO)msg.textContent='Cargando piano…';
+  try{bufs=await loadPiano()}catch{}
+  const {r,i,down}=EAR.q,t=AC.currentTime+.05,a=down?r+i:r,b=down?r:r+i;
+  EAR.busy=t+EAR_LEN;
+  if(bufs){piano(bufs,a,t,.9);piano(bufs,b,t+1,1.5)}else{tone(a,t);tone(b,t+1)}
+  msg.className='small';msg.textContent=down?'Descendente':'Ascendente';
+  setTimeout(()=>btns.forEach(b=>b&&(b.disabled=false)),EAR_LEN*1000+50);
+}
 const vg=document.getElementById('v-guia');
 // Respaldo para navegadores sin <details name>: cerrar las demás al abrir una.
 vg.addEventListener('toggle',e=>{const d=e.target;if(d.open&&d.name==='guia'){vg.querySelectorAll('details[name=guia][open]').forEach(x=>x!==d&&(x.open=false));d.scrollIntoView({block:'nearest'})}},true);
@@ -707,7 +744,7 @@ vg.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
   else if(t.id==='ear-new')earNew();
   else if(t.dataset.int&&EAR.q){const ok=+t.dataset.int===EAR.q.i;EAR.n++;if(ok)EAR.ok++;
     const m=document.getElementById('ear-msg');m.className='small '+(ok?'ok':'bad');m.textContent=ok?'¡Bien! '+INTS[EAR.q.i-1]:'Era '+INTS[EAR.q.i-1];
-    document.getElementById('ear-score').textContent=EAR.ok+'/'+EAR.n;if(ok)setTimeout(earNew,900)}
+    document.getElementById('ear-score').textContent=EAR.ok+'/'+EAR.n;if(ok)setTimeout(earNew,Math.max(900,(EAR.busy-AC.currentTime)*1000+150))}
   else if(t.id==='exp'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='piano-respaldo-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
 });
 vg.addEventListener('change',e=>{const t=e.target;
